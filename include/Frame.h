@@ -81,6 +81,12 @@ public:
 
     // Check if a MapPoint is in the frustum of the camera
     // and fill variables of the MapPoint to be used by the tracking
+
+    //bool isInFrustum(MapPoint* pMP, float viewingCosLimit)
+    //函数功能：确定mappoint是否可视
+    //输入：一个mappoint，可视角度阈值
+    //输出：是否可视的bool
+    //准则：1.投影之后是否在图像上，2.距离是否在尺度不变距离之内，3.是否在视角范围之内
     bool isInFrustum(MapPoint* pMP, float viewingCosLimit);
 
     // Compute the cell of a keypoint (return false if outside the grid)

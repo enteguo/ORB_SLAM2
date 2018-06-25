@@ -87,6 +87,9 @@ public:
     void ReplaceMapPointMatch(const size_t &idx, MapPoint* pMP);
     std::set<MapPoint*> GetMapPoints();
     std::vector<MapPoint*> GetMapPointMatches();
+
+    //TrackedMapPoints(const int &minObs)
+    //函数功能：统计跟踪的mappoints被观测次数大于minObs的点数
     int TrackedMapPoints(const int &minObs);
     MapPoint* GetMapPoint(const size_t &idx);
 

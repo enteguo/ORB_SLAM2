@@ -274,20 +274,22 @@ bool Frame::isInFrustum(MapPoint *pMP, float viewingCosLimit)
     cv::Mat P = pMP->GetWorldPos(); 
 
     // 3D in camera coordinates
-    const cv::Mat Pc = mRcw*P+mtcw;
+    const cv::Mat Pc = mRcw*P+mtcw;    //变换至当前帧坐标系下
     const float &PcX = Pc.at<float>(0);
     const float &PcY= Pc.at<float>(1);
     const float &PcZ = Pc.at<float>(2);
 
     // Check positive depth
+    //深度是否小于0
     if(PcZ<0.0f)
         return false;
 
     // Project in image and check it is not outside
+    //投影到图像上
     const float invz = 1.0f/PcZ;
     const float u=fx*PcX*invz+cx;
     const float v=fy*PcY*invz+cy;
-
+    //是否还在图像上
     if(u<mnMinX || u>mnMaxX)
         return false;
     if(v<mnMinY || v>mnMaxY)
@@ -298,13 +300,14 @@ bool Frame::isInFrustum(MapPoint *pMP, float viewingCosLimit)
     const float minDistance = pMP->GetMinDistanceInvariance();
     const cv::Mat PO = P-mOw;
     const float dist = cv::norm(PO);
-
+    //是否在尺度变换的范围内
     if(dist<minDistance || dist>maxDistance)
         return false;
 
    // Check viewing angle
     cv::Mat Pn = pMP->GetNormal();
-
+    //mappoint方向角
+    //  n'*i/||n||
     const float viewCos = PO.dot(Pn)/dist;
 
     if(viewCos<viewingCosLimit)

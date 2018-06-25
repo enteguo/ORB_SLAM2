@@ -426,7 +426,7 @@ void Tracking::Track()
                 cv::Mat LastTwc = cv::Mat::eye(4,4,CV_32F);
                 mLastFrame.GetRotationInverse().copyTo(LastTwc.rowRange(0,3).colRange(0,3));
                 mLastFrame.GetCameraCenter().copyTo(LastTwc.rowRange(0,3).col(3));
-                mVelocity = mCurrentFrame.mTcw*LastTwc;
+                mVelocity = mCurrentFrame.mTcw*LastTwc;   //更新速度模型
             }
             else
                 mVelocity = cv::Mat();
@@ -434,6 +434,7 @@ void Tracking::Track()
             mpMapDrawer->SetCurrentCameraPose(mCurrentFrame.mTcw);
 
             // Clean VO matches
+            //清除没有被观测的mappoints
             for(int i=0; i<mCurrentFrame.N; i++)
             {
                 MapPoint* pMP = mCurrentFrame.mvpMapPoints[i];
@@ -454,6 +455,7 @@ void Tracking::Track()
             mlpTemporalPoints.clear();
 
             // Check if we need to insert a new keyframe
+            //插入关键帧
             if(NeedNewKeyFrame())
                 CreateNewKeyFrame();
 
@@ -770,6 +772,7 @@ bool Tracking::TrackReferenceKeyFrame()
         return false;
 
     mCurrentFrame.mvpMapPoints = vpMapPointMatches;
+    //上一帧pose作为当前帧pose
     mCurrentFrame.SetPose(mLastFrame.mTcw);
 
     Optimizer::PoseOptimization(&mCurrentFrame);
@@ -976,6 +979,10 @@ bool Tracking::TrackLocalMap()
 
 bool Tracking::NeedNewKeyFrame()
 {
+    //三种情况不插入KF
+    //1.只做跟踪
+    //2.回环线程在工作
+    //3.刚刚重定位不久或关键帧数超过最大关键帧数
     if(mbOnlyTracking)
         return false;
 
@@ -990,7 +997,7 @@ bool Tracking::NeedNewKeyFrame()
         return false;
 
     // Tracked MapPoints in the reference keyframe
-    int nMinObs = 3;
+    int nMinObs = 3;   //最小被观测的次数
     if(nKFs<=2)
         nMinObs=2;
     int nRefMatches = mpReferenceKF->TrackedMapPoints(nMinObs);
@@ -1143,6 +1150,7 @@ void Tracking::CreateNewKeyFrame()
 void Tracking::SearchLocalPoints()
 {
     // Do not search map points already matched
+    //更新能观测到该点的帧数加1，标记该点被当前帧观测到，标记该点将来不被投影
     for(vector<MapPoint*>::iterator vit=mCurrentFrame.mvpMapPoints.begin(), vend=mCurrentFrame.mvpMapPoints.end(); vit!=vend; vit++)
     {
         MapPoint* pMP = *vit;
@@ -1154,9 +1162,9 @@ void Tracking::SearchLocalPoints()
             }
             else
             {
-                pMP->IncreaseVisible();
-                pMP->mnLastFrameSeen = mCurrentFrame.mnId;
-                pMP->mbTrackInView = false;
+                pMP->IncreaseVisible();     //可视
+                pMP->mnLastFrameSeen = mCurrentFrame.mnId;   //被观测帧ID
+                pMP->mbTrackInView = false;  //不被投影跟踪
             }
         }
     }
@@ -1164,6 +1172,7 @@ void Tracking::SearchLocalPoints()
     int nToMatch=0;
 
     // Project points in frame and check its visibility
+    //不要查找当前帧已经有的mappoints了
     for(vector<MapPoint*>::iterator vit=mvpLocalMapPoints.begin(), vend=mvpLocalMapPoints.end(); vit!=vend; vit++)
     {
         MapPoint* pMP = *vit;
@@ -1186,9 +1195,10 @@ void Tracking::SearchLocalPoints()
         if(mSensor==System::RGBD)
             th=3;
         // If the camera has been relocalised recently, perform a coarser search
+        //重定位之后，搜索都用粗糙的
         if(mCurrentFrame.mnId<mnLastRelocFrameId+2)
             th=5;
-        matcher.SearchByProjection(mCurrentFrame,mvpLocalMapPoints,th);
+        matcher.SearchByProjection(mCurrentFrame,mvpLocalMapPoints,th);  //通过投影搜索匹配
     }
 }
 
@@ -1232,6 +1242,7 @@ void Tracking::UpdateLocalKeyFrames()
 {
     // Each map point vote for the keyframes in which it has been observed
     map<KeyFrame*,int> keyframeCounter;
+    //遍历当前帧的mappoints，其他KF帧如果能观测到该点就+1
     for(int i=0; i<mCurrentFrame.N; i++)
     {
         if(mCurrentFrame.mvpMapPoints[i])
@@ -1257,9 +1268,11 @@ void Tracking::UpdateLocalKeyFrames()
     KeyFrame* pKFmax= static_cast<KeyFrame*>(NULL);
 
     mvpLocalKeyFrames.clear();
-    mvpLocalKeyFrames.reserve(3*keyframeCounter.size());
+    mvpLocalKeyFrames.reserve(3*keyframeCounter.size());  //开辟一个三倍观测到特征点KF数量大小的局部KF空间
 
     // All keyframes that observe a map point are included in the local map. Also check which keyframe shares most points
+    //所有能观测到当前帧mappoints的KF都是局部KF
+    //观测点数最多的是参考帧
     for(map<KeyFrame*,int>::const_iterator it=keyframeCounter.begin(), itEnd=keyframeCounter.end(); it!=itEnd; it++)
     {
         KeyFrame* pKF = it->first;
@@ -1279,6 +1292,7 @@ void Tracking::UpdateLocalKeyFrames()
 
 
     // Include also some not-already-included keyframes that are neighbors to already-included keyframes
+    //遍历局部KF，找到局部KF的10个最大共视KF，子KF，父KF，都加入局部KF
     for(vector<KeyFrame*>::const_iterator itKF=mvpLocalKeyFrames.begin(), itEndKF=mvpLocalKeyFrames.end(); itKF!=itEndKF; itKF++)
     {
         // Limit the number of keyframes
@@ -1331,6 +1345,7 @@ void Tracking::UpdateLocalKeyFrames()
 
     }
 
+    //将共同观测点数最多的KF作为参考KF
     if(pKFmax)
     {
         mpReferenceKF = pKFmax;

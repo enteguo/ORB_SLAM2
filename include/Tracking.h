@@ -124,21 +124,51 @@ protected:
     void StereoInitialization();
 
     // Map initialization for monocular
+    //函数功能：单目视觉的初始化
+    //选取两个初始帧，通过单应矩阵和基本矩阵初始化pose
+    //通过pose三角化mappoints
+    //最后优化
     void MonocularInitialization();
     void CreateInitialMapMonocular();
 
     void CheckReplacedInLastFrame();
+    //TrackReferenceKeyFrame()
+    //函数功能：用上一帧pose，匹配参考KF的KP，并优化pose
+    //通过BOW匹配参考KF上的KF，用上一帧pose作为当前pose
+    //优化，去除outliner
+    //返回是否有大于10个inliner，即为跟踪成功
     bool TrackReferenceKeyFrame();
     void UpdateLastFrame();
+    //TrackWithMotionModel()
+    //函数功能：假设运动状态不变，通过前面的运动状态推断出当前帧pose
+    //通过当前帧pose使用投影搜索匹配KF，如果匹配点数过少，扩大搜索范围
+    //优化，去除outliner，返回是否有大于10个inliner，即为跟踪成功
     bool TrackWithMotionModel();
 
     bool Relocalization();
 
     void UpdateLocalMap();
+    //UpdateLocalPoints（）
+    //函数功能：局部mappoints更新
+    //从局部KF所有的mappoints（除了当前帧的mappoints）添加到局部mapoints
     void UpdateLocalPoints();
+
+    //UpdateLocalKeyFrames()
+    //功能：为当前帧选出KF加入局部KF
+    //三个策略：1.和当前帧观测到同样mappoints的KF
+    //         2.（1）中的KF的最大共视10帧，子KF,父KF
+    //         3.与当前帧观测到maopoints点数最多的KF为参考KF
     void UpdateLocalKeyFrames();
 
+
+    //TrackLocalMap()
+    //函数功能：投影局部mappoints，并优化
+    //1.如果刚刚重定位过，并且inliner特征点小于50，则失败
+    //2.如果inliner特征点小于30则失败
     bool TrackLocalMap();
+
+    //SearchLocalPoints()
+    //函数功能：查找当前帧可视的mappoints，并通过投影匹配
     void SearchLocalPoints();
 
     bool NeedNewKeyFrame();
