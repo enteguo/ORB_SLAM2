@@ -37,7 +37,8 @@ namespace ORB_SLAM2
 class ORBmatcher
 {    
 public:
-
+    //函数功能：匹配器类构造函数
+    //输入：最佳得分和第二得分的比例(0.6)，以及是否执行角度检测(true)
     ORBmatcher(float nnratio=0.6, bool checkOri=true);
 
     // Computes the Hamming distance between two ORB descriptors
