@@ -171,6 +171,18 @@ protected:
     //函数功能：查找当前帧可视的mappoints，并通过投影匹配
     void SearchLocalPoints();
 
+    //bool NeedNewKeyFrame();
+    //函数功能：判断是否需要插入关键帧
+    //三种情况不插入KF
+    //1.只做跟踪
+    //2.回环线程在工作
+    //3.刚刚重定位不久或关键帧数超过最大关键帧数
+    //得到参考关键帧跟踪到的MapPoints数量，
+    //在执行上判断如果参考帧的MapPoints点被观测到的次数大于minObs，则认为该点被跟踪到，并递增计数器
+    //插入关键帧的条件
+    //1.离上一个KF较远
+    //2.mapping线程空闲
+    //3.跟踪的inliner小于参考帧跟踪的inliner的90%
     bool NeedNewKeyFrame();
     void CreateNewKeyFrame();
 
