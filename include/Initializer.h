@@ -82,6 +82,7 @@ private:
     vector<cv::KeyPoint> mvKeys2;
 
     // Current Matches from Reference to Current
+    //match类型，记录Reference到Current匹配上的特征点对
     vector<Match> mvMatches12;
     vector<bool> mvbMatched1;
 

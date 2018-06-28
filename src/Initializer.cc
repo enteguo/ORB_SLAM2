@@ -48,7 +48,7 @@ bool Initializer::Initialize(const Frame &CurrentFrame, const vector<int> &vMatc
     // Reference Frame: 1, Current Frame: 2
     mvKeys2 = CurrentFrame.mvKeysUn;
 
-    mvMatches12.clear();
+    mvMatches12.clear();    //初始参考帧和当前帧的特征点对匹配
     mvMatches12.reserve(mvKeys2.size());
     mvbMatched1.resize(mvKeys1.size());
     for(size_t i=0, iend=vMatches12.size();i<iend; i++)
@@ -71,10 +71,11 @@ bool Initializer::Initialize(const Frame &CurrentFrame, const vector<int> &vMatc
 
     for(int i=0; i<N; i++)
     {
-        vAllIndices.push_back(i);
+        vAllIndices.push_back(i);   //匹配点对的序号
     }
 
     // Generate sets of 8 points for each RANSAC iteration
+    //随机从点对中选出8对为一组，最多选出mMaxIterations组
     mvSets = vector< vector<size_t> >(mMaxIterations,vector<size_t>(8,0));
 
     DUtils::Random::SeedRandOnce(0);
