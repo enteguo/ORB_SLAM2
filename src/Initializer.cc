@@ -128,7 +128,8 @@ void Initializer::FindHomography(vector<bool> &vbMatchesInliers, float &score, c
     const int N = mvMatches12.size();
 
     // Normalize coordinates
-    vector<cv::Point2f> vPn1, vPn2;
+    //归一化到均值为0，一阶绝对矩为1，归一化矩阵[x',y']T=T1[x,y]T
+    vector<cv::Point2f> vPn1, vPn2;   //归一化的二维点
     cv::Mat T1, T2;
     Normalize(mvKeys1,vPn1, T1);
     Normalize(mvKeys2,vPn2, T2);
@@ -158,7 +159,7 @@ void Initializer::FindHomography(vector<bool> &vbMatchesInliers, float &score, c
         }
 
         cv::Mat Hn = ComputeH21(vPn1i,vPn2i);
-        H21i = T2inv*Hn*T1;
+        H21i = T2inv*Hn*T1;  //变换回归一化前
         H12i = H21i.inv();
 
         currentScore = CheckHomography(H21i, H12i, vbCurrentInliers, mSigma);
@@ -349,7 +350,7 @@ float Initializer::CheckHomography(const cv::Mat &H21, const cv::Mat &H12, vecto
 
         // Reprojection error in first image
         // x2in1 = H12*x2
-
+        //投影到当前帧
         const float w2in1inv = 1.0/(h31inv*u2+h32inv*v2+h33inv);
         const float u2in1 = (h11inv*u2+h12inv*v2+h13inv)*w2in1inv;
         const float v2in1 = (h21inv*u2+h22inv*v2+h23inv)*w2in1inv;
@@ -370,7 +371,7 @@ float Initializer::CheckHomography(const cv::Mat &H21, const cv::Mat &H12, vecto
         const float u1in2 = (h11*u1+h12*v1+h13)*w1in2inv;
         const float v1in2 = (h21*u1+h22*v1+h23)*w1in2inv;
 
-        const float squareDist2 = (u2-u1in2)*(u2-u1in2)+(v2-v1in2)*(v2-v1in2);
+        const float squareDist2 = (u2-u1in2)*(u2-u1in2)+(v2-v1in2)*(v2-v1in2);   //重投影误差
 
         const float chiSquare2 = squareDist2*invSigmaSquare;
 
