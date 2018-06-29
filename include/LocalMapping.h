@@ -59,6 +59,9 @@ public:
     bool isStopped();
     bool stopRequested();
     bool AcceptKeyFrames();
+
+    //SetAcceptKeyFrames
+    //函数功能：告诉Tracking，LocalMapping正处于繁忙状态
     void SetAcceptKeyFrames(bool flag);
     bool SetNotStop(bool flag);
 
@@ -74,7 +77,16 @@ public:
 
 protected:
 
+    //CheckNewKeyFrames
+    //函数功能：检查mlNewKeyFrames是否为空（队列中是否还有KF）
+    //输出：为空返回0，否则返回1
     bool CheckNewKeyFrames();
+
+    //ProcessNewKeyFrame
+    //函数功能：类似CreateInitialMapMonocular这个函数
+    //1.对tracking的新KF上的kps与localmap中的mappoins关联，
+    //2.计算词袋。3.计算某个KP最佳描述子
+    //4.计算平均方向和深度。5.计算共视图。6，KF插入地图
     void ProcessNewKeyFrame();
     void CreateNewMapPoints();
 

@@ -81,6 +81,8 @@ public:
     std::set<KeyFrame*> GetLoopEdges();
 
     // MapPoint observation functions
+    //AddMapPoint
+    //函数功能：二维KP和三维mappoints的对应
     void AddMapPoint(MapPoint* pMP, const size_t &idx);
     void EraseMapPointMatch(const size_t &idx);
     void EraseMapPointMatch(MapPoint* pMP);

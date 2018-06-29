@@ -640,6 +640,7 @@ void Tracking::MonocularInitialization()
 void Tracking::CreateInitialMapMonocular()
 {
     // Create KeyFrames
+    //将初始化帧和当前帧作为关键帧
     KeyFrame* pKFini = new KeyFrame(mInitialFrame,mpMap,mpKeyFrameDB);
     KeyFrame* pKFcur = new KeyFrame(mCurrentFrame,mpMap,mpKeyFrameDB);
 
@@ -662,6 +663,7 @@ void Tracking::CreateInitialMapMonocular()
 
         MapPoint* pMP = new MapPoint(worldPos,pKFcur,mpMap);
 
+        //KP和mappoint的对应
         pKFini->AddMapPoint(pMP,i);
         pKFcur->AddMapPoint(pMP,mvIniMatches[i]);
 
@@ -1006,6 +1008,7 @@ bool Tracking::NeedNewKeyFrame()
     int nRefMatches = mpReferenceKF->TrackedMapPoints(nMinObs);
 
     // Local Mapping accept keyframes?
+    //localmap是否正忙
     bool bLocalMappingIdle = mpLocalMapper->AcceptKeyFrames();
 
     // Check how many "close" points are being tracked and how many could be potentially created.

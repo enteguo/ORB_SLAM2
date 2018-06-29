@@ -127,6 +127,7 @@ bool LocalMapping::CheckNewKeyFrames()
 
 void LocalMapping::ProcessNewKeyFrame()
 {
+    //拿出当前帧
     {
         unique_lock<mutex> lock(mMutexNewKFs);
         mpCurrentKeyFrame = mlNewKeyFrames.front();
@@ -137,6 +138,7 @@ void LocalMapping::ProcessNewKeyFrame()
     mpCurrentKeyFrame->ComputeBoW();
 
     // Associate MapPoints to the new keyframe and update normal and descriptor
+    //取出mappoints
     const vector<MapPoint*> vpMapPointMatches = mpCurrentKeyFrame->GetMapPointMatches();
 
     for(size_t i=0; i<vpMapPointMatches.size(); i++)
@@ -152,7 +154,7 @@ void LocalMapping::ProcessNewKeyFrame()
                     pMP->UpdateNormalAndDepth();
                     pMP->ComputeDistinctiveDescriptors();
                 }
-                else // this can only happen for new stereo points inserted by the Tracking
+                else // this can only happen for new stereo points inserted by he Tracking
                 {
                     mlpRecentAddedMapPoints.push_back(pMP);
                 }
@@ -161,9 +163,11 @@ void LocalMapping::ProcessNewKeyFrame()
     }    
 
     // Update links in the Covisibility Graph
+    //共视图
     mpCurrentKeyFrame->UpdateConnections();
 
     // Insert Keyframe in Map
+    //插入到地图
     mpMap->AddKeyFrame(mpCurrentKeyFrame);
 }
 

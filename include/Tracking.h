@@ -129,6 +129,10 @@ protected:
     //通过pose三角化mappoints
     //最后优化
     void MonocularInitialization();
+
+    //CreateInitialMapMonocular
+    //函数功能：1.注册关键帧。2.计算词袋。3.将KF和mappoints加入地图。4.计算某个KP最佳描述子
+    //5.计算平均方向和深度。6.计算共视图。7.
     void CreateInitialMapMonocular();
 
     void CheckReplacedInLastFrame();
@@ -139,6 +143,7 @@ protected:
     //返回是否有大于10个inliner，即为跟踪成功
     bool TrackReferenceKeyFrame();
     void UpdateLastFrame();
+
     //TrackWithMotionModel()
     //函数功能：假设运动状态不变，通过前面的运动状态推断出当前帧pose
     //通过当前帧pose使用投影搜索匹配KF，如果匹配点数过少，扩大搜索范围
@@ -148,6 +153,7 @@ protected:
     bool Relocalization();
 
     void UpdateLocalMap();
+
     //UpdateLocalPoints（）
     //函数功能：局部mappoints更新
     //从局部KF所有的mappoints（除了当前帧的mappoints）添加到局部mapoints

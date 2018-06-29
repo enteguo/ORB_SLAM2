@@ -101,7 +101,8 @@ void MapPoint::AddObservation(KeyFrame* pKF, size_t idx)
     if(mObservations.count(pKF))
         return;
     mObservations[pKF]=idx;
-
+ 
+    //如果是双目
     if(pKF->mvuRight[idx]>=0)
         nObs+=2;
     else

@@ -54,6 +54,11 @@ private:
     cv::Mat ComputeH21(const vector<cv::Point2f> &vP1, const vector<cv::Point2f> &vP2);
     cv::Mat ComputeF21(const vector<cv::Point2f> &vP1, const vector<cv::Point2f> &vP2);
 
+
+    //CheckHomography
+    //函数功能：检查单应矩阵是否正确，并选出inliners
+    //输入：单应矩阵H21，H12，内点vbMatchesInliers，标准差singma
+    //输出：重投影误差的得分
     float CheckHomography(const cv::Mat &H21, const cv::Mat &H12, vector<bool> &vbMatchesInliers, float sigma);
 
     float CheckFundamental(const cv::Mat &F21, vector<bool> &vbMatchesInliers, float sigma);

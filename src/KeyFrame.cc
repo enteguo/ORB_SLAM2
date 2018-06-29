@@ -28,6 +28,10 @@ namespace ORB_SLAM2
 
 long unsigned int KeyFrame::nNextId=0;
 
+
+//KeyFrame
+//KF构造函数
+//输入：帧F，地图pMap，关键帧数据库KeyFrameDatabase
 KeyFrame::KeyFrame(Frame &F, Map *pMap, KeyFrameDatabase *pKFDB):
     mnFrameId(F.mnId),  mTimeStamp(F.mTimeStamp), mnGridCols(FRAME_GRID_COLS), mnGridRows(FRAME_GRID_ROWS),
     mfGridElementWidthInv(F.mfGridElementWidthInv), mfGridElementHeightInv(F.mfGridElementHeightInv),

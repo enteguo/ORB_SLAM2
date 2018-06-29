@@ -51,6 +51,9 @@ public:
     std::map<KeyFrame*,size_t> GetObservations();
     int Observations();
 
+    //AddObservation
+    //函数功能：该MapPoint可以被哪个KeyFrame的哪个特征点观测到
+    //输入：关键帧， kp的id
     void AddObservation(KeyFrame* pKF,size_t idx);
     void EraseObservation(KeyFrame* pKF);
 
@@ -70,10 +73,18 @@ public:
         return mnFound;
     }
 
+    //ComputeDistinctiveDescriptors
+    //函数功能：从众多观测到该MapPoint的特征点中挑选区分度最高的描述子
+    //计算所有描述子两两之间的距离，计算所有描述子两两距离的中值，取最小的为最有代表性的描述子
     void ComputeDistinctiveDescriptors();
 
     cv::Mat GetDescriptor();
 
+    //函数功能：计算平均方向和计算金字塔每一层可能的深度范围
+    //更新平均观测方向以及观测距离范围，由于一个MapPoint会被许多相机观测到，因此在插入关键帧后，
+    //需要更新相应变量，获得观测到该3d点的所有关键帧，对所有关键帧对该点的观测方向归一化为单位向量进行求和，
+    //除以所有关键帧数就是获得的平均观测方向。获得观测到该点的参考关键帧和3d点在世界坐标系中的位置，
+    //得到该点到参考关键帧相机的距离，预测其在金字塔中的层数，就可以获得其距离范围。
     void UpdateNormalAndDepth();
 
     float GetMinDistanceInvariance();
@@ -86,7 +97,9 @@ public:
     static long unsigned int nNextId;
     long int mnFirstKFid;
     long int mnFirstFrame;
-    int nObs;
+
+    //nObs被观测次数
+    int nObs;     
 
     // Variables used by the tracking
     float mTrackProjX;
