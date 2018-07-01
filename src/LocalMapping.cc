@@ -155,6 +155,7 @@ void LocalMapping::ProcessNewKeyFrame()
                     pMP->ComputeDistinctiveDescriptors();
                 }
                 else // this can only happen for new stereo points inserted by he Tracking
+                    //如果该mappoints已经是当前帧的Mappoins
                 {
                     mlpRecentAddedMapPoints.push_back(pMP);
                 }
@@ -191,11 +192,13 @@ void LocalMapping::MapPointCulling()
         {
             lit = mlpRecentAddedMapPoints.erase(lit);
         }
+        //被提取出来的kp比被投影能看到的该点的帧数多25%
         else if(pMP->GetFoundRatio()<0.25f )
         {
             pMP->SetBadFlag();
             lit = mlpRecentAddedMapPoints.erase(lit);
         }
+        //当前帧观测到该点比第一次观测到该点多2帧以上，并且该点被观测次数小于阈值cnThObs
         else if(((int)nCurrentKFid-(int)pMP->mnFirstKFid)>=2 && pMP->Observations()<=cnThObs)
         {
             pMP->SetBadFlag();

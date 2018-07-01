@@ -90,6 +90,12 @@ protected:
     void ProcessNewKeyFrame();
     void CreateNewMapPoints();
 
+    //MapPointCulling
+    //函数功能：对最近添加的Mappoints进行挑选
+    //1.不是bad的点
+    //2.被检测到比被重投影观测到的帧大于25%
+    //3.被观测次数小于阈值，并且检测到该点的两个KF不能差2帧以上
+    //4.检测到该点的两个KF不能差3帧以上
     void MapPointCulling();
     void SearchInNeighbors();
 
