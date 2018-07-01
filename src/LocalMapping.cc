@@ -74,6 +74,7 @@ void LocalMapping::Run()
 
             mbAbortBA = false;
 
+            //进行和当前帧相连的关键帧及MapPoint做局部BA优化
             if(!CheckNewKeyFrames() && !stopRequested())
             {
                 // Local BA
@@ -217,6 +218,7 @@ void LocalMapping::CreateNewMapPoints()
     int nn = 10;
     if(mbMonocular)
         nn=20;
+    //最佳共视的20帧
     const vector<KeyFrame*> vpNeighKFs = mpCurrentKeyFrame->GetBestCovisibilityKeyFrames(nn);
 
     ORBmatcher matcher(0.6,false);
@@ -249,6 +251,7 @@ void LocalMapping::CreateNewMapPoints()
         KeyFrame* pKF2 = vpNeighKFs[i];
 
         // Check first that baseline is not too short
+        //基线要大于场景深度中值的1%
         cv::Mat Ow2 = pKF2->GetCameraCenter();
         cv::Mat vBaseline = Ow2-Ow1;
         const float baseline = cv::norm(vBaseline);
@@ -263,6 +266,7 @@ void LocalMapping::CreateNewMapPoints()
             const float medianDepthKF2 = pKF2->ComputeSceneMedianDepth(2);
             const float ratioBaselineDepth = baseline/medianDepthKF2;
 
+            //两帧之间的基线要大于深度中值的1%
             if(ratioBaselineDepth<0.01)
                 continue;
         }
@@ -271,6 +275,7 @@ void LocalMapping::CreateNewMapPoints()
         cv::Mat F12 = ComputeF12(mpCurrentKeyFrame,pKF2);
 
         // Search matches that fullfil epipolar constraint
+        //极线搜索匹配
         vector<pair<size_t,size_t> > vMatchedIndices;
         matcher.SearchForTriangulation(mpCurrentKeyFrame,pKF2,F12,vMatchedIndices,false);
 
@@ -304,12 +309,13 @@ void LocalMapping::CreateNewMapPoints()
             bool bStereo2 = kp2_ur>=0;
 
             // Check parallax between rays
-            cv::Mat xn1 = (cv::Mat_<float>(3,1) << (kp1.pt.x-cx1)*invfx1, (kp1.pt.y-cy1)*invfy1, 1.0);
+            cv::Mat xn1 = (cv::Mat_<float>(3,1) << (kp1.pt.x-cx1)*invfx1, (kp1.pt.y-cy1)*invfy1, 1.0);  //反向投影
             cv::Mat xn2 = (cv::Mat_<float>(3,1) << (kp2.pt.x-cx2)*invfx2, (kp2.pt.y-cy2)*invfy2, 1.0);
 
+            //转到world系
             cv::Mat ray1 = Rwc1*xn1;
             cv::Mat ray2 = Rwc2*xn2;
-            const float cosParallaxRays = ray1.dot(ray2)/(cv::norm(ray1)*cv::norm(ray2));
+            const float cosParallaxRays = ray1.dot(ray2)/(cv::norm(ray1)*cv::norm(ray2)); //cos夹角
 
             float cosParallaxStereo = cosParallaxRays+1;
             float cosParallaxStereo1 = cosParallaxStereo;
@@ -326,6 +332,7 @@ void LocalMapping::CreateNewMapPoints()
             if(cosParallaxRays<cosParallaxStereo && cosParallaxRays>0 && (bStereo1 || bStereo2 || cosParallaxRays<0.9998))
             {
                 // Linear Triangulation Method
+                //三角化
                 cv::Mat A(4,4,CV_32F);
                 A.row(0) = xn1.at<float>(0)*Tcw1.row(2)-Tcw1.row(0);
                 A.row(1) = xn1.at<float>(1)*Tcw1.row(2)-Tcw1.row(1);
@@ -358,6 +365,7 @@ void LocalMapping::CreateNewMapPoints()
             cv::Mat x3Dt = x3D.t();
 
             //Check triangulation in front of cameras
+            //变换到相机坐标系，是否深度大于0
             float z1 = Rcw1.row(2).dot(x3Dt)+tcw1.at<float>(2);
             if(z1<=0)
                 continue;
@@ -367,6 +375,7 @@ void LocalMapping::CreateNewMapPoints()
                 continue;
 
             //Check reprojection error in first keyframe
+            //重投影误差是否可接受
             const float &sigmaSquare1 = mpCurrentKeyFrame->mvLevelSigma2[kp1.octave];
             const float x1 = Rcw1.row(0).dot(x3Dt)+tcw1.at<float>(0);
             const float y1 = Rcw1.row(1).dot(x3Dt)+tcw1.at<float>(1);
@@ -461,6 +470,7 @@ void LocalMapping::CreateNewMapPoints()
 void LocalMapping::SearchInNeighbors()
 {
     // Retrieve neighbor keyframes
+    //检索当前帧的最佳共视帧20帧和20共视帧的共视帧5帧，作为要融合特征点的目标帧
     int nn = 10;
     if(mbMonocular)
         nn=20;
@@ -475,6 +485,7 @@ void LocalMapping::SearchInNeighbors()
         pKFi->mnFuseTargetForKF = mpCurrentKeyFrame->mnId;
 
         // Extend to some second neighbors
+        //最佳共视帧的共视帧5帧作为二级邻近共视帧
         const vector<KeyFrame*> vpSecondNeighKFs = pKFi->GetBestCovisibilityKeyFrames(5);
         for(vector<KeyFrame*>::const_iterator vit2=vpSecondNeighKFs.begin(), vend2=vpSecondNeighKFs.end(); vit2!=vend2; vit2++)
         {
@@ -487,6 +498,7 @@ void LocalMapping::SearchInNeighbors()
 
 
     // Search matches by projection from current KF in target KFs
+    //遍历所有的融合mappoitns的目标帧，将当前帧的mappoints与目标帧的mappoints融合
     ORBmatcher matcher;
     vector<MapPoint*> vpMapPointMatches = mpCurrentKeyFrame->GetMapPointMatches();
     for(vector<KeyFrame*>::iterator vit=vpTargetKFs.begin(), vend=vpTargetKFs.end(); vit!=vend; vit++)
@@ -497,6 +509,7 @@ void LocalMapping::SearchInNeighbors()
     }
 
     // Search matches by projection from target KFs in current KF
+    //融合mappoints的目标帧上的mappoints融合当前帧的mappoints
     vector<MapPoint*> vpFuseCandidates;
     vpFuseCandidates.reserve(vpTargetKFs.size()*vpMapPointMatches.size());
 

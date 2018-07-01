@@ -875,10 +875,12 @@ int ORBmatcher::Fuse(KeyFrame *pKF, const vector<MapPoint *> &vpMapPoints, const
         const float dist3D = cv::norm(PO);
 
         // Depth must be inside the scale pyramid of the image
+        //根据深度，判断在金字塔的哪一层，层和深度有关
         if(dist3D<minDistance || dist3D>maxDistance )
             continue;
 
         // Viewing angle must be less than 60 deg
+        //视角要在60度以内
         cv::Mat Pn = pMP->GetNormal();
 
         if(PO.dot(Pn)<0.5*dist3D)
@@ -889,7 +891,7 @@ int ORBmatcher::Fuse(KeyFrame *pKF, const vector<MapPoint *> &vpMapPoints, const
         // Search in a radius
         const float radius = th*pKF->mvScaleFactors[nPredictedLevel];
 
-        const vector<size_t> vIndices = pKF->GetFeaturesInArea(u,v,radius);
+        const vector<size_t> vIndices = pKF->GetFeaturesInArea(u,v,radius); //获得一个范围内的kp
 
         if(vIndices.empty())
             continue;
@@ -933,7 +935,7 @@ int ORBmatcher::Fuse(KeyFrame *pKF, const vector<MapPoint *> &vpMapPoints, const
                 const float ey = v-kpy;
                 const float e2 = ex*ex+ey*ey;
 
-                if(e2*pKF->mvInvLevelSigma2[kpLevel]>5.99)
+                if(e2*pKF->mvInvLevelSigma2[kpLevel]>5.99)   //找出重投影到kf上点(u,v)半径内的点
                     continue;
             }
 
@@ -941,7 +943,7 @@ int ORBmatcher::Fuse(KeyFrame *pKF, const vector<MapPoint *> &vpMapPoints, const
 
             const int dist = DescriptorDistance(dMP,dKF);
 
-            if(dist<bestDist)
+            if(dist<bestDist)   //最小的描述子距离
             {
                 bestDist = dist;
                 bestIdx = idx;
@@ -957,7 +959,7 @@ int ORBmatcher::Fuse(KeyFrame *pKF, const vector<MapPoint *> &vpMapPoints, const
                 if(!pMPinKF->isBad())
                 {
                     if(pMPinKF->Observations()>pMP->Observations())
-                        pMP->Replace(pMPinKF);
+                        pMP->Replace(pMPinKF);      //看谁被观测次数多
                     else
                         pMPinKF->Replace(pMP);
                 }

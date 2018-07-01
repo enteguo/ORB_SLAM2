@@ -88,6 +88,9 @@ public:
     void EraseMapPointMatch(MapPoint* pMP);
     void ReplaceMapPointMatch(const size_t &idx, MapPoint* pMP);
     std::set<MapPoint*> GetMapPoints();
+
+    //GetMapPointMatches
+    //函数功能：返回mappoints
     std::vector<MapPoint*> GetMapPointMatches();
 
     //TrackedMapPoints(const int &minObs)

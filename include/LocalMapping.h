@@ -88,6 +88,11 @@ protected:
     //2.计算词袋。3.计算某个KP最佳描述子
     //4.计算平均方向和深度。5.计算共视图。6，KF插入地图
     void ProcessNewKeyFrame();
+
+    //CreateNewMapPoints
+    //函数功能：三角化三维点
+    //遍历20个最佳共视帧，检查基线是否大于场景深度中值的1%，
+    //极线搜索匹配，三角化。检查深度是否大于0，重投影误差是否能接受
     void CreateNewMapPoints();
 
     //MapPointCulling
@@ -97,8 +102,18 @@ protected:
     //3.被观测次数小于阈值，并且检测到该点的两个KF不能差2帧以上
     //4.检测到该点的两个KF不能差3帧以上
     void MapPointCulling();
+
+    //SearchInNeighbors
+    //函数功能：在融合目标帧中搜索将近似的mappoints融合
+    //融合目标帧定义为：一级相邻帧和二级相邻帧，一级相邻帧为当前帧的最优20共视帧；二级相邻帧为共视帧的最优5个共视帧
+    //遍历所有的融合目标帧，将当前帧的mappoints与目标帧的mappoints融合，
+    //融合目标帧上的mappoints与当前帧的mappoints相融合
+    //最后更新当前帧MapPoints的描述子，深度，观测主方向等属性，更新当前帧的MapPoints后更新与其它帧的连接关系。
     void SearchInNeighbors();
 
+    //KeyFrameCulling
+    //函数功能：对当前帧与其共视的关键帧进行剔除，90%以上的MapPoint能被其他共视关键帧所观测到，那么该帧就会被剔除。
+    //
     void KeyFrameCulling();
 
     cv::Mat ComputeF12(KeyFrame* &pKF1, KeyFrame* &pKF2);

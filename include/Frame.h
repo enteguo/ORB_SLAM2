@@ -92,6 +92,11 @@ public:
     // Compute the cell of a keypoint (return false if outside the grid)
     bool PosInGrid(const cv::KeyPoint &kp, int &posX, int &posY);
 
+
+    //GetFeaturesInArea
+    //函数功能：获得图像上一个范围内的所有特征点
+    //输入：（x,y）坐标，范围r
+    //输出：特征点的index
     vector<size_t> GetFeaturesInArea(const float &x, const float  &y, const float  &r, const int minLevel=-1, const int maxLevel=-1) const;
 
     // Search a match for each keypoint in the left image to a keypoint in the right image.

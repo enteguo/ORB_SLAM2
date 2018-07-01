@@ -78,6 +78,11 @@ public:
     int SearchBySim3(KeyFrame* pKF1, KeyFrame* pKF2, std::vector<MapPoint *> &vpMatches12, const float &s12, const cv::Mat &R12, const cv::Mat &t12, const float th);
 
     // Project MapPoints into KeyFrame and search for duplicated MapPoints.
+    //函数功能：将当前帧与KF匹配的mappoints与现有的重复mappoints融合
+    //输入：关键帧kf，3d地图点mappoints，搜索半径阈值th
+    //输出：融合点的个数
+    //遍历所有匹配的点，重投影到KF，在一个半径内找到所有点，比较并找到最小描述子距离的点，
+    //并找到该特征点对应的MapPoint,然后比较两个MapPoint的被观测的次数谁多，谁就是最优，3d地图点mappoints被最佳的mappoins替代
     int Fuse(KeyFrame* pKF, const vector<MapPoint *> &vpMapPoints, const float th=3.0);
 
     // Project MapPoints into KeyFrame using a given Sim3 and search for duplicated MapPoints.

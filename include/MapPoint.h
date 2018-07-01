@@ -39,6 +39,8 @@ class Frame;
 class MapPoint
 {
 public:
+
+    //输入：世界坐标系下三维点，KF，map
     MapPoint(const cv::Mat &Pos, KeyFrame* pRefKF, Map* pMap);
     MapPoint(const cv::Mat &Pos,  Map* pMap, Frame* pFrame, const int &idxF);
 
