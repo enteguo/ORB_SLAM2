@@ -146,7 +146,7 @@ protected:
 
     //TrackWithMotionModel()
     //函数功能：假设运动状态不变，通过前面的运动状态推断出当前帧pose
-    //通过当前帧pose使用投影搜索匹配KF，如果匹配点数过少，扩大搜索范围
+    //通过当前帧pose使用投影搜索匹配kp，如果匹配点数过少，扩大搜索范围
     //优化，去除outliner，返回是否有大于10个inliner，即为跟踪成功
     bool TrackWithMotionModel();
 

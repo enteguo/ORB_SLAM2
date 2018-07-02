@@ -50,6 +50,11 @@ public:
 
     // Project MapPoints tracked in last frame into the current frame and search matches.
     // Used to track from previous frame (Tracking)
+    //函数功能：通过投影匹配
+    //通过投影，对上一帧的特征点进行跟踪，将上一帧的MapPoints投影到当前帧(根据速度模型可以估计当前帧的Tcw)，
+    //在执行上：依次遍历参考帧的pMapPoints，计算出该3D点在当前帧的投影位置，
+    //设定一个以该点为中心的正方形区域内的所有特征点，获得该3D点的描述子和这些特征点的描述子之间的距离，
+    //找到距离最小的那个特征点，就是该3D点在当前帧匹配到的特征点。返回成功匹配的数量。
     int SearchByProjection(Frame &CurrentFrame, const Frame &LastFrame, const float th, const bool bMono);
 
     // Project MapPoints seen in KeyFrame into the Frame and search matches.
