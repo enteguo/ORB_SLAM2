@@ -888,6 +888,7 @@ bool Tracking::TrackWithMotionModel()
         th=15;
     else
         th=7;
+    //将上一帧的mappoints投影到当前帧，在一定半径内搜索匹配
     int nmatches = matcher.SearchByProjection(mCurrentFrame,mLastFrame,th,mSensor==System::MONOCULAR);
 
     // If few matches, uses a wider window search
