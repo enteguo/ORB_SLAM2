@@ -86,7 +86,15 @@ public:
 
 protected:
 
+    //ComputePyramid
+    //函数功能：提取图像金字塔，下采样
+    //输入：图像
     void ComputePyramid(cv::Mat image);
+
+    //ComputeKeyPointsOctTree
+    //函数功能：对每一层图像金字塔计算特征点和描述子
+    //输入：vector<vector<kp> >代表每一层金字塔的所有特征点
+    //去掉边缘像素点，对去掉边缘的图像网格化，依次在每个网格提取关键点
     void ComputeKeyPointsOctTree(std::vector<std::vector<cv::KeyPoint> >& allKeypoints);    
     std::vector<cv::KeyPoint> DistributeOctTree(const std::vector<cv::KeyPoint>& vToDistributeKeys, const int &minX,
                                            const int &maxX, const int &minY, const int &maxY, const int &nFeatures, const int &level);
