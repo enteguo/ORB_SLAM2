@@ -235,7 +235,9 @@ protected:
     float mbf;
 
     //New KeyFrame rules (according to fps)
+    //初始化为0
     int mMinFrames;
+    //初始化为fps
     int mMaxFrames;
 
     // Threshold close/far points

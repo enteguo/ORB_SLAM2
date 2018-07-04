@@ -292,7 +292,7 @@ MapPoint* KeyFrame::GetMapPoint(const size_t &idx)
 
 void KeyFrame::UpdateConnections()
 {
-    map<KeyFrame*,int> KFcounter;
+    map<KeyFrame*,int> KFcounter;   //KF-权重
 
     vector<MapPoint*> vpMP;
 
@@ -342,20 +342,21 @@ void KeyFrame::UpdateConnections()
             nmax=mit->second;
             pKFmax=mit->first;
         }
-        if(mit->second>=th)
+        if(mit->second>=th)  //超过15个点的共视，就连接为关键帧
         {
             vPairs.push_back(make_pair(mit->second,mit->first));
             (mit->first)->AddConnection(this,mit->second);
         }
     }
 
+    //如果没有超过阈值的共视，就取最大的
     if(vPairs.empty())
     {
         vPairs.push_back(make_pair(nmax,pKFmax));
         pKFmax->AddConnection(this,nmax);
     }
 
-    sort(vPairs.begin(),vPairs.end());
+    sort(vPairs.begin(),vPairs.end());   //从大往小排
     list<KeyFrame*> lKFs;
     list<int> lWs;
     for(size_t i=0; i<vPairs.size();i++)
