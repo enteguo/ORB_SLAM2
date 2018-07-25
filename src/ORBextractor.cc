@@ -540,7 +540,7 @@ vector<cv::KeyPoint> ORBextractor::DistributeOctTree(const vector<cv::KeyPoint>&
                                        const int &maxX, const int &minY, const int &maxY, const int &N, const int &level)
 {
     // Compute how many initial nodes   
-    const int nIni = round(static_cast<float>(maxX-minX)/(maxY-minY));
+    const int nIni = round(static_cast<float>(maxX-minX)/(maxY-minY));   //结果小于0.5会出错
 
     const float hX = static_cast<float>(maxX-minX)/nIni;
 
@@ -1054,6 +1054,7 @@ void ORBextractor::operator()( InputArray _image, InputArray _mask, vector<KeyPo
     ComputePyramid(image);
 
     vector < vector<KeyPoint> > allKeypoints;
+    //计算特征点，特征点方向
     ComputeKeyPointsOctTree(allKeypoints);
     //ComputeKeyPointsOld(allKeypoints);
 
@@ -1083,6 +1084,7 @@ void ORBextractor::operator()( InputArray _image, InputArray _mask, vector<KeyPo
             continue;
 
         // preprocess the resized image
+        //去除噪声，高斯模糊
         Mat workingMat = mvImagePyramid[level].clone();
         GaussianBlur(workingMat, workingMat, Size(7, 7), 2, 2, BORDER_REFLECT_101);
 

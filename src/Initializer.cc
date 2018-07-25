@@ -802,6 +802,7 @@ int Initializer::CheckRT(const cv::Mat &R, const cv::Mat &t, const vector<cv::Ke
                        const cv::Mat &K, vector<cv::Point3f> &vP3D, float th2, vector<bool> &vbGood, float &parallax)
 {
     // Calibration parameters
+    //得到旋转位移
     const float fx = K.at<float>(0,0);
     const float fy = K.at<float>(1,1);
     const float cx = K.at<float>(0,2);

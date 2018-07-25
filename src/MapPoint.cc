@@ -363,6 +363,8 @@ void MapPoint::UpdateNormalAndDepth()
     const float levelScaleFactor =  pRefKF->mvScaleFactors[level];
     const int nLevels = pRefKF->mnScaleLevels;
 
+    //观测到该点的所有KF的方向和除以观测到该点KF的帧数为平均方向
+    //特征点所在的金字塔层数，将距离乘上尺度因子就是金字塔距离范围
     {
         unique_lock<mutex> lock3(mMutexPos);
         mfMaxDistance = dist*levelScaleFactor;

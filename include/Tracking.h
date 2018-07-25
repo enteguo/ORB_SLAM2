@@ -163,7 +163,7 @@ protected:
     //功能：为当前帧选出KF加入局部KF
     //三个策略：1.和当前帧观测到同样mappoints的KF
     //         2.（1）中的KF的最大共视10帧，子KF,父KF
-    //         3.与当前帧观测到maopoints点数最多的KF为参考KF
+    //         3.与当前帧观测到mappoints点数最多的KF为参考KF
     void UpdateLocalKeyFrames();
 
 

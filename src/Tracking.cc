@@ -702,11 +702,13 @@ void Tracking::CreateInitialMapMonocular()
     }
 
     // Scale initial baseline
+    //两帧之间的位移除以中值深度
     cv::Mat Tc2w = pKFcur->GetPose();
     Tc2w.col(3).rowRange(0,3) = Tc2w.col(3).rowRange(0,3)*invMedianDepth;
     pKFcur->SetPose(Tc2w);
 
     // Scale points
+    //所有Mappoints除以中值深度
     vector<MapPoint*> vpAllMapPoints = pKFini->GetMapPointMatches();
     for(size_t iMP=0; iMP<vpAllMapPoints.size(); iMP++)
     {
